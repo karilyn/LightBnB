@@ -1,5 +1,5 @@
-const properties = require('./json/properties.json');
-const users = require('./json/users.json');
+// const properties = require('./json/properties.json');
+// const users = require('./json/users.json');
 const { Pool } = require('pg');
 
 const pool = new Pool({
@@ -16,18 +16,44 @@ const pool = new Pool({
  * @param {String} email The email of the user.
  * @return {Promise<{}>} A promise to the user.
  */
+
+// Accepts an email address and will return a promise.
+// The promise should resolve with a user object with the given email address, or null if that user does not exist.
+
+// const getUserWithEmail = function(email) {
+//   let user;
+//   for (const userId in users) {
+//     user = users[userId];
+//     if (user.email.toLowerCase() === email.toLowerCase()) {
+//       break;
+//     } else {
+//       user = null;
+//     }
+//   }
+//   return Promise.resolve(user);
+// }
+
 const getUserWithEmail = function(email) {
-  let user;
-  for (const userId in users) {
-    user = users[userId];
-    if (user.email.toLowerCase() === email.toLowerCase()) {
-      break;
-    } else {
-      user = null;
-    }
-  }
-  return Promise.resolve(user);
+  return pool
+    .query('SELECT * FROM users WHERE LOWER(email) = LOWER($1)', [email])
+    .then((result) => {
+      let user = result.rows[0];
+      return user;
+    })
+    .catch((err) => {
+      console.error("User not found");
+    });
 }
+
+if (require.main === module) {
+  let result = getUserWithEmail("tristanjacobs@gmail.com");
+  result.then((data) => {
+    console.log(data);
+    process.exit(0);
+  });
+}
+
+
 exports.getUserWithEmail = getUserWithEmail;
 
 /**
@@ -111,3 +137,4 @@ const addProperty = function(property) {
   return Promise.resolve(property);
 }
 exports.addProperty = addProperty;
+
