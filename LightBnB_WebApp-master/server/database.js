@@ -23,11 +23,10 @@ const pool = new Pool({
 const getUserWithEmail = function(email) {
   return pool
     .query('SELECT * FROM users WHERE LOWER(email) = LOWER($1)', [email])
-    .then((result) => {
-      return result.rows[0] || null;
-    })
+    .then((result) => result.rows[0] || null)
     .catch((err) => {
-      console.error("User not found");
+      console.error("User not found")
+      throw err;
     });
 }
 
@@ -49,14 +48,12 @@ exports.getUserWithEmail = getUserWithEmail;
  */
 const getUserWithId = function(id) {
   return pool
-   .query(`SELECT id, name, email FROM users WHERE id = $1`, [id])
-   .then((result) => {
-    if (result.rows.length === 0) {
-      return null;
-    } else {
-      return result.rows;
-    }
-  });
+    .query(`SELECT id, name, email FROM users WHERE id = $1`, [id])
+    .then((result) => result.rows[0] || null)
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    })
 }
 exports.getUserWithId = getUserWithId;
 
@@ -70,8 +67,10 @@ const addUser =  function(user) {
   return pool
     .query(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *`,
     [user.name, user.email, user.password])
-    .then((result) => {
-      return result.rows[0] || null;
+    .then((result) => result.rows[0] || null)
+    .catch((err) => {
+      console.error(err);
+      throw err;
     })
 }
 exports.addUser = addUser;
@@ -93,7 +92,11 @@ const getAllReservations = function(userId, limit = 10) {
     GROUP BY reservations.id, properties.id
     ORDER BY start_date
     LIMIT $2`, [userId, limit])
-    .then((result) => result.rows || null);
+    .then((result) => result.rows || null)
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    })
 }
 exports.getAllReservations = getAllReservations;
 
