@@ -83,8 +83,17 @@ exports.addUser = addUser;
  * @param {string} guest_id The id of the user.
  * @return {Promise<[{}]>} A promise to the reservations.
  */
-const getAllReservations = function(guest_id, limit = 10) {
-  return getAllProperties(null, 2);
+const getAllReservations = function(userId, limit = 10) {
+  return pool
+    .query(`SELECT properties.*, start_date, end_date, cost_per_night, avg(property_reviews.rating) as average_rating
+    FROM properties
+    JOIN reservations on properties.id = reservations.property_id
+    JOIN property_reviews ON properties.id = property_reviews.property_id
+    WHERE reservations.guest_id = $1
+    GROUP BY reservations.id, properties.id
+    ORDER BY start_date
+    LIMIT $2`, [userId, limit])
+    .then((result) => result.rows || null);
 }
 exports.getAllReservations = getAllReservations;
 
@@ -96,14 +105,6 @@ exports.getAllReservations = getAllReservations;
  * @param {*} limit The number of results to return.
  * @return {Promise<[{}]>}  A promise to the properties.
  */
-// const getAllProperties = function(options, limit = 10) {
-//   const limitedProperties = {};
-//   for (let i = 1; i <= limit; i++) {
-//     limitedProperties[i] = properties[i];
-//   }
-//   return Promise.resolve(limitedProperties);
-// }
-// exports.getAllProperties = getAllProperties;
 
 const getAllProperties = (options, limit = 10) => {
   return pool
