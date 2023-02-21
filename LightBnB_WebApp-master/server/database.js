@@ -1,14 +1,14 @@
 // const properties = require('./json/properties.json');
 // const users = require('./json/users.json');
 const { Pool } = require('pg');
+require("dotenv").config();
 
-//* create a dot env file
-//* create a dot env example
 const pool = new Pool({
-  user: 'karilynkempton',
-  password: '123',
-  host: 'localhost',
-  database: 'lightbnb'
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
 });
 
 // Users
