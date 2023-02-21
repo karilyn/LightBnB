@@ -19,21 +19,6 @@ const pool = new Pool({
  * @return {Promise<{}>} A promise to the user.
  */
 
-// Accepts an email address and will return a promise.
-// The promise should resolve with a user object with the given email address, or null if that user does not exist.
-
-// const getUserWithEmail = function(email) {
-//   let user;
-//   for (const userId in users) {
-//     user = users[userId];
-//     if (user.email.toLowerCase() === email.toLowerCase()) {
-//       break;
-//     } else {
-//       user = null;
-//     }
-//   }
-//   return Promise.resolve(user);
-// }
 
 const getUserWithEmail = function(email) {
   return pool
@@ -69,7 +54,7 @@ const getUserWithId = function(id) {
     if (result.rows.length === 0) {
       return null;
     } else {
-      return result.rows
+      return result.rows;
     }
   });
 }
@@ -82,10 +67,12 @@ exports.getUserWithId = getUserWithId;
  * @return {Promise<{}>} A promise to the user.
  */
 const addUser =  function(user) {
-  const userId = Object.keys(users).length + 1;
-  user.id = userId;
-  users[userId] = user;
-  return Promise.resolve(user);
+  return pool
+    .query(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *`,
+    [user.name, user.email, user.password])
+    .then((result) => {
+      return result.rows[0] || null;
+    })
 }
 exports.addUser = addUser;
 
@@ -130,7 +117,7 @@ const getAllProperties = (options, limit = 10) => {
       console.error(err);
       //* if we return the error the promise resolves, and if we throw it it
       //* gets passed to the next promise and then rejects
-      throw err
+      throw err;
     })
 };
 exports.getAllProperties = getAllProperties;
