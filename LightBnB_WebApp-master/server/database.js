@@ -64,9 +64,12 @@ exports.getUserWithId = getUserWithId;
  * @return {Promise<{}>} A promise to the user.
  */
 const addUser =  function(user) {
-  return pool
-    .query(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *`,
-    [user.name, user.email, user.password])
+  const queryParams = [user.name, user.email, user.password]
+  let queryString = `INSERT INTO users (name, email, password)
+  VALUES ($1, $2, $3)
+  RETURNING *
+  `;
+  return pool.query(queryString, queryParams)
     .then((result) => result.rows[0] || null)
     .catch((err) => {
       console.error(err);
@@ -92,7 +95,7 @@ const getAllReservations = function(userId, limit = 10) {
     GROUP BY reservations.id, properties.id
     ORDER BY start_date
     LIMIT $2`, [userId, limit])
-    .then((result) => result.rows || null)
+    .then((result) => result.rows)
     .catch((err) => {
       console.error(err);
       throw err;
@@ -110,20 +113,81 @@ exports.getAllReservations = getAllReservations;
  */
 
 const getAllProperties = (options, limit = 10) => {
-  return pool
-    //* .query returns a promise, so does .then
-    .query(`SELECT * FROM properties LIMIT $1`, [limit])
-    .then((result) => {
-      return result.rows;
-    })
-    //* you don't actually need to do the error here because it's not an entry point to the client
-    .catch((err) => {
-      console.error(err);
-      //* if we return the error the promise resolves, and if we throw it it
-      //* gets passed to the next promise and then rejects
-      throw err;
-    })
+  console.log("initial limit:", limit);
+  const queryParams = [];
+  let queryString = `
+  SELECT properties.*, avg(property_reviews.rating) as average_rating
+  FROM properties
+  JOIN property_reviews ON properties.id = property_id
+  `;
+
+  //* Adding to the options object
+  // if city is passed into options object, append query to queryString
+  if (options.city) {
+    queryParams.push(`${options.city}`);
+    queryString += `WHERE LOWER(city) = LOWER($${queryParams.length}) `;
+  }
+
+  //* For the following possible options, first check to see if queryParams contains anything
+  //* if so, use AND before query option; if not, use WHERE since it is first option
+  // if user selects owner_id in options, append it to queryString
+  if (options.owner_id && queryParams.length > 0) {
+    queryParams.push(`${options.owner_id}`);
+    queryString += `AND owner_id = $${queryParams.length}`;
+  }
+  if (options.owner_id && queryParams.length === 0) {
+    queryParams.push(`${options.owner_id}`);
+    queryString += `WHERE owner_id = $${queryParams.length} `;
+  }
+
+  // if user selects minimum_price_per_night in options, append it to queryString
+  if (options.minimum_price_per_night && queryParams.length > 0) {
+    queryParams.push(`${options.minimum_price_per_night * 100}`);
+    queryString += `AND cost_per_night >= $${queryParams.length} `;
+  }
+  if (options.minimum_price_per_night && queryParams.length === 0) {
+    queryParams.push(`${options.minimum_price_per_night * 100}`);
+    queryString += `WHERE cost_per_night >= $${queryParams.length} `;
+  }
+
+  // if user selects maximum_price_per_night in options, append it to queryString
+  if (options.maximum_price_per_night && queryParams.length > 0) {
+    queryParams.push(`${options.maximum_price_per_night * 100}`);
+    queryString += `AND cost_per_night <= $${queryParams.length}`;
+  }
+  if (options.maximum_price_per_night && queryParams.length === 0) {
+    queryParams.push(`${options.maximum_price_per_night * 100}`);
+    queryString += `WHERE cost_per_night <= $${queryParams.length} `;
+  }
+
+  // Append the GROUP BY statement to queryString
+  queryString += `
+  GROUP BY properties.id
+  `;
+
+  // if user selects minimum_rating in options, append it to queryString with HAVING clause
+  if (options.minimum_rating) {
+    queryParams.push(`${options.minimum_rating}`);
+    queryString += `HAVING avg(property_reviews.rating) >= $${queryParams.length} `;
+  }
+
+  // order by cost_per_night and append the limit to queryString
+  console.log("limit before push:", limit);
+  queryParams.push(limit);
+  queryString += `
+  ORDER BY cost_per_night
+  LIMIT $${queryParams.length}
+  `;
+
+  console.log(queryString, queryParams);
+
+  return pool.query(queryString, queryParams)
+  .then((result) => result.rows)
+
+
 };
+
+
 exports.getAllProperties = getAllProperties;
 
 
@@ -135,10 +199,43 @@ exports.getAllProperties = getAllProperties;
  * @return {Promise<{}>} A promise to the property.
  */
 const addProperty = function(property) {
-  const propertyId = Object.keys(properties).length + 1;
-  property.id = propertyId;
-  properties[propertyId] = property;
-  return Promise.resolve(property);
+  // const propertyId = Object.keys(properties).length + 1;
+  // property.id = propertyId;
+  // properties[propertyId] = property;
+  // return Promise.resolve(property);
+
+  const queryParams = [
+    property.owner_id,
+    property.title,
+    property.description,
+    property.thumbnail_photo_url,
+    property.cover_photo_url,
+    property.cost_per_night,
+    property.parking_spaces,
+    property. number_of_bathrooms,
+    property.number_of_bedrooms,
+    property.street,
+    property.city,
+    property.province,
+    property.post_code,
+    property.country,
+  ]
+
+  let queryString = `
+  INSERT INTO PROPERTIES (owner_id, title, description, thumbnail_photo_url,
+    cover_photo_url, cost_per_night, parking_spaces, number_of_bathrooms,
+    number_of_bedrooms, street, city, province, post_code, country)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9 $10, $11, $12, $13, $13)
+    RETURNING *`
+
+  return pool.query(queryString, queryParams)
+    .then((result) => result.rows[0] || null)
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    })
 }
+
+// if it doesn't meet minimum requirements
 exports.addProperty = addProperty;
 
