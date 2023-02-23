@@ -1,5 +1,3 @@
-// const properties = require('./json/properties.json');
-// const users = require('./json/users.json');
 const { Pool } = require('pg');
 require("dotenv").config();
 
@@ -113,7 +111,6 @@ exports.getAllReservations = getAllReservations;
  */
 
 const getAllProperties = (options, limit = 10) => {
-  console.log("initial limit:", limit);
   const queryParams = [];
   let queryString = `
   SELECT properties.*, avg(property_reviews.rating) as average_rating
@@ -124,8 +121,8 @@ const getAllProperties = (options, limit = 10) => {
   //* Adding to the options object
   // if city is passed into options object, append query to queryString
   if (options.city) {
-    queryParams.push(`${options.city}`);
-    queryString += `WHERE LOWER(city) = LOWER($${queryParams.length}) `;
+    queryParams.push(`%${options.city}%`);
+    queryString += `WHERE LOWER(city) LIKE LOWER($${queryParams.length}) `;
   }
 
   //* For the following possible options, first check to see if queryParams contains anything
@@ -199,10 +196,6 @@ exports.getAllProperties = getAllProperties;
  * @return {Promise<{}>} A promise to the property.
  */
 const addProperty = function(property) {
-  // const propertyId = Object.keys(properties).length + 1;
-  // property.id = propertyId;
-  // properties[propertyId] = property;
-  // return Promise.resolve(property);
 
   const queryParams = [
     property.title,
