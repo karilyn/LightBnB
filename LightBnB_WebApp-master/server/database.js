@@ -205,37 +205,36 @@ const addProperty = function(property) {
   // return Promise.resolve(property);
 
   const queryParams = [
-    property.owner_id,
     property.title,
     property.description,
+    property.owner_id,
     property.thumbnail_photo_url,
     property.cover_photo_url,
     property.cost_per_night,
     property.parking_spaces,
     property. number_of_bathrooms,
     property.number_of_bedrooms,
-    property.street,
-    property.city,
     property.province,
-    property.post_code,
+    property.city,
     property.country,
-  ]
+    property.street,
+    property.post_code,
+  ];
 
   let queryString = `
-  INSERT INTO PROPERTIES (owner_id, title, description, thumbnail_photo_url,
+  INSERT INTO PROPERTIES (title, description, owner_id, thumbnail_photo_url,
     cover_photo_url, cost_per_night, parking_spaces, number_of_bathrooms,
-    number_of_bedrooms, street, city, province, post_code, country)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9 $10, $11, $12, $13, $13)
-    RETURNING *`
+    number_of_bedrooms, province, city, country, street, post_code)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+    RETURNING *`;
 
   return pool.query(queryString, queryParams)
-    .then((result) => result.rows[0] || null)
+    .then((result) => result.rows[0])
     .catch((err) => {
       console.error(err);
       throw err;
     })
 }
 
-// if it doesn't meet minimum requirements
 exports.addProperty = addProperty;
 
