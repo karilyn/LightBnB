@@ -1,5 +1,3 @@
-/// so we break api into a sub router, jump to here to define all the gets,
-// and then send them back to the api router definition
 module.exports = function(router, database) {
 
   router.get('/properties', (req, res) => {
@@ -37,7 +35,6 @@ module.exports = function(router, database) {
         res.send(e)
       });
   });
-/// once we're done setting the routes, we append them to the api route
 
   return router;
 }
