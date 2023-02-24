@@ -107,6 +107,7 @@ const getAllProperties = (options, limit = 10) => {
   // if city is passed into options object, append query to queryString
   if (options.city) {
     queryParams.push(`%${options.city}%`);
+    // turn query and database result into lowercase so a match is more likely
     queryString += `WHERE LOWER(city) LIKE LOWER($${queryParams.length}) `;
   }
 
