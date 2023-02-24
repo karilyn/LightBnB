@@ -13,10 +13,52 @@ In this project, I learned how to:
 
 # Project Features
 
-A user can 
+A user can: 
 - create an account and then login and logout
 - Search properties using a variety of dynamic search parameters
 - Create a new listing
 - View thier own listings and reservations
 
+# Project Structure
+├── public
+│   ├── index.html
+│   ├── javascript
+│   │   ├── components 
+│   │   │   ├── header.js
+│   │   │   ├── login_form.js
+│   │   │   ├── new_property_form.js
+│   │   │   ├── property_listing.js
+│   │   │   ├── property_listings.js
+│   │   │   ├── search_form.js
+│   │   │   └── signup_form.js
+│   │   ├── index.js
+│   │   ├── libraries
+│   │   ├── network.js
+│   │   └── views_manager.js
+│   └── styles
+├── sass
+└── server
+  ├── apiRoutes.js
+  ├── database.js
+  ├── json
+  ├── server.js
+  ├── userRoutes.js
+  └── db
+      └──db.js
+      
+# Installation Instructions
 
+1. Clone the project into your terminal and install dependencies using `npm install`. 
+2. Start the web server in LightBnB_WebApp-master using the `npm run local` command. 
+3. Go to localhost:3000 in your browser or set your own host using your own environment variables. 
+
+# Project Screenshots 
+
+![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
+![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
+![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
+![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
+
+# Entity Relationship Diagram 
+
+Check out the project ERD [here](/relative/path/to/img.jpg?raw=true "Optional Title")
