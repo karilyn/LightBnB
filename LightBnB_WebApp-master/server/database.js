@@ -7,8 +7,6 @@ const pool = require('./db/db');
  * @param {String} email The email of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-
-
 const getUserWithEmail = function(email) {
   return pool
     .query('SELECT * FROM users WHERE LOWER(email) = LOWER($1)', [email])
@@ -17,16 +15,7 @@ const getUserWithEmail = function(email) {
       console.error("User not found")
       throw err;
     });
-}
-
-if (require.main === module) {
-  let result = getUserWithEmail("tristanjacobs@gmail.com");
-  result.then((data) => {
-    console.log(data);
-    process.exit(0);
-  });
-}
-
+};
 
 exports.getUserWithEmail = getUserWithEmail;
 
@@ -42,8 +31,8 @@ const getUserWithId = function(id) {
     .catch((err) => {
       console.error(err);
       throw err;
-    })
-}
+    });
+};
 exports.getUserWithId = getUserWithId;
 
 
