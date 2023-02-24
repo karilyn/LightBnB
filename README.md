@@ -19,32 +19,6 @@ A user can:
 - Create a new listing
 - View thier own listings and reservations
 
-# Project Structure
-├── public
-│   ├── index.html
-│   ├── javascript
-│   │   ├── components 
-│   │   │   ├── header.js
-│   │   │   ├── login_form.js
-│   │   │   ├── new_property_form.js
-│   │   │   ├── property_listing.js
-│   │   │   ├── property_listings.js
-│   │   │   ├── search_form.js
-│   │   │   └── signup_form.js
-│   │   ├── index.js
-│   │   ├── libraries
-│   │   ├── network.js
-│   │   └── views_manager.js
-│   └── styles
-├── sass
-└── server
-  ├── apiRoutes.js
-  ├── database.js
-  ├── json
-  ├── server.js
-  ├── userRoutes.js
-  └── db
-      └──db.js
       
 # Installation Instructions
 
@@ -61,4 +35,4 @@ A user can:
 
 # Entity Relationship Diagram 
 
-Check out the project ERD [here](/relative/path/to/img.jpg?raw=true "Optional Title")
+![ERD](https://raw.githubusercontent.com/karilyn/LightBnB/b3cda154cd856d73302b7a98f1f487fb62964203/docs/lightBnB.jpg))
