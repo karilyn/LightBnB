@@ -9,6 +9,7 @@ const pool = require('./db/db');
  */
 const getUserWithEmail = function(email) {
   return pool
+    // convert email to lowercase to ensure user input and database match
     .query('SELECT * FROM users WHERE LOWER(email) = LOWER($1)', [email])
     .then((result) => result.rows[0] || null)
     .catch((err) => {
@@ -33,6 +34,7 @@ const getUserWithId = function(id) {
       throw err;
     });
 };
+
 exports.getUserWithId = getUserWithId;
 
 
@@ -54,6 +56,7 @@ const addUser =  function(user) {
       throw err;
     })
 }
+
 exports.addUser = addUser;
 
 /// Reservations
@@ -77,8 +80,9 @@ const getAllReservations = function(userId, limit = 10) {
     .catch((err) => {
       console.error(err);
       throw err;
-    })
-}
+    });
+};
+
 exports.getAllReservations = getAllReservations;
 
 /// Properties
@@ -89,7 +93,6 @@ exports.getAllReservations = getAllReservations;
  * @param {*} limit The number of results to return.
  * @return {Promise<[{}]>}  A promise to the properties.
  */
-
 const getAllProperties = (options, limit = 10) => {
   const queryParams = [];
   let queryString = `
@@ -108,33 +111,33 @@ const getAllProperties = (options, limit = 10) => {
   //* For the following possible options, first check to see if queryParams contains anything
   //* if so, use AND before query option; if not, use WHERE since it is first option
   // if user selects owner_id in options, append it to queryString
-  if (options.owner_id && queryParams.length > 0) {
+  if (options.owner_id) {
     queryParams.push(`${options.owner_id}`);
-    queryString += `AND owner_id = $${queryParams.length}`;
-  }
-  if (options.owner_id && queryParams.length === 0) {
-    queryParams.push(`${options.owner_id}`);
+    if (queryParams.length > 0) {
+      queryString += `AND owner_id = $${queryParams.length}`;
+    } else {
     queryString += `WHERE owner_id = $${queryParams.length} `;
+    }
   }
 
   // if user selects minimum_price_per_night in options, append it to queryString
-  if (options.minimum_price_per_night && queryParams.length > 0) {
+  if (options.minimum_price_per_night) {
     queryParams.push(`${options.minimum_price_per_night * 100}`);
-    queryString += `AND cost_per_night >= $${queryParams.length} `;
-  }
-  if (options.minimum_price_per_night && queryParams.length === 0) {
-    queryParams.push(`${options.minimum_price_per_night * 100}`);
-    queryString += `WHERE cost_per_night >= $${queryParams.length} `;
+    if (queryParams.length > 0) {
+      queryString += `AND cost_per_night >= $${queryParams.length} `;
+    } else {
+      queryString += `WHERE cost_per_night >= $${queryParams.length} `;
+    }
   }
 
   // if user selects maximum_price_per_night in options, append it to queryString
-  if (options.maximum_price_per_night && queryParams.length > 0) {
+  if (options.maximum_price_per_night) {
     queryParams.push(`${options.maximum_price_per_night * 100}`);
-    queryString += `AND cost_per_night <= $${queryParams.length}`;
-  }
-  if (options.maximum_price_per_night && queryParams.length === 0) {
-    queryParams.push(`${options.maximum_price_per_night * 100}`);
-    queryString += `WHERE cost_per_night <= $${queryParams.length} `;
+    if (queryParams.length > 0) {
+      queryString += `AND cost_per_night <= $${queryParams.length}`;
+    } else {
+      queryString += `WHERE cost_per_night <= $${queryParams.length} `;
+    }
   }
 
   // Append the GROUP BY statement to queryString
@@ -149,24 +152,17 @@ const getAllProperties = (options, limit = 10) => {
   }
 
   // order by cost_per_night and append the limit to queryString
-  console.log("limit before push:", limit);
   queryParams.push(limit);
   queryString += `
   ORDER BY cost_per_night
   LIMIT $${queryParams.length}
   `;
 
-  console.log(queryString, queryParams);
-
   return pool.query(queryString, queryParams)
   .then((result) => result.rows)
-
-
 };
 
-
 exports.getAllProperties = getAllProperties;
-
 
 
 
