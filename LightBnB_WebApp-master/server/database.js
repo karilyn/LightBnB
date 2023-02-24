@@ -1,4 +1,4 @@
-const pool = require('./db/db');
+const pool = require('./db/db')
 
 // Users
 
@@ -7,16 +7,16 @@ const pool = require('./db/db');
  * @param {String} email The email of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-const getUserWithEmail = function(email) {
+const getUserWithEmail = function (email) {
   return pool
     // convert email to lowercase to ensure user input and database match
     .query('SELECT * FROM users WHERE LOWER(email) = LOWER($1)', [email])
     .then((result) => result.rows[0] || null)
     .catch((err) => {
-      console.error("User not found")
-      throw err;
-    });
-};
+      console.error('User not found')
+      throw err
+    })
+}
 
 exports.getUserWithEmail = getUserWithEmail;
 
@@ -25,37 +25,38 @@ exports.getUserWithEmail = getUserWithEmail;
  * @param {string} id The id of the user.
  * @return {Promise<{}>} A promise to the user.
  */
-const getUserWithId = function(id) {
+const getUserWithId = function (id) {
   return pool
     .query(`SELECT id, name, email FROM users WHERE id = $1`, [id])
     .then((result) => result.rows[0] || null)
     .catch((err) => {
       console.error(err);
       throw err;
-    });
+    })
 };
 
 exports.getUserWithId = getUserWithId;
-
 
 /**
  * Add a new user to the database.
  * @param {{name: string, password: string, email: string}} user
  * @return {Promise<{}>} A promise to the user.
  */
-const addUser =  function(user) {
-  const queryParams = [user.name, user.email, user.password]
-  let queryString = `INSERT INTO users (name, email, password)
+const addUser = function (user) {
+  const queryParams = [user.name, user.email, user.password];
+
+  const queryString = `INSERT INTO users (name, email, password)
   VALUES ($1, $2, $3)
   RETURNING *
   `;
+
   return pool.query(queryString, queryParams)
     .then((result) => result.rows[0] || null)
     .catch((err) => {
       console.error(err);
       throw err;
     })
-}
+};
 
 exports.addUser = addUser;
 
@@ -66,7 +67,7 @@ exports.addUser = addUser;
  * @param {string} guest_id The id of the user.
  * @return {Promise<[{}]>} A promise to the reservations.
  */
-const getAllReservations = function(userId, limit = 10) {
+const getAllReservations = function (userId, limit = 10) {
   return pool
     .query(`SELECT properties.*, start_date, end_date, cost_per_night, avg(property_reviews.rating) as average_rating
     FROM properties
@@ -80,7 +81,7 @@ const getAllReservations = function(userId, limit = 10) {
     .catch((err) => {
       console.error(err);
       throw err;
-    });
+    })
 };
 
 exports.getAllReservations = getAllReservations;
@@ -95,6 +96,7 @@ exports.getAllReservations = getAllReservations;
  */
 const getAllProperties = (options, limit = 10) => {
   const queryParams = [];
+
   let queryString = `
   SELECT properties.*, avg(property_reviews.rating) as average_rating
   FROM properties
@@ -116,7 +118,7 @@ const getAllProperties = (options, limit = 10) => {
     if (queryParams.length > 0) {
       queryString += `AND owner_id = $${queryParams.length}`;
     } else {
-    queryString += `WHERE owner_id = $${queryParams.length} `;
+      queryString += `WHERE owner_id = $${queryParams.length} `;
     }
   }
 
@@ -159,20 +161,17 @@ const getAllProperties = (options, limit = 10) => {
   `;
 
   return pool.query(queryString, queryParams)
-  .then((result) => result.rows)
+    .then((result) => result.rows)
 };
 
 exports.getAllProperties = getAllProperties;
-
-
 
 /**
  * Add a property to the database
  * @param {{}} property An object containing all of the property details.
  * @return {Promise<{}>} A promise to the property.
  */
-const addProperty = function(property) {
-
+const addProperty = function (property) {
   const queryParams = [
     property.title,
     property.description,
@@ -181,16 +180,16 @@ const addProperty = function(property) {
     property.cover_photo_url,
     property.cost_per_night,
     property.parking_spaces,
-    property. number_of_bathrooms,
+    property.number_of_bathrooms,
     property.number_of_bedrooms,
     property.province,
     property.city,
     property.country,
     property.street,
-    property.post_code,
+    property.post_code
   ];
 
-  let queryString = `
+  const queryString = `
   INSERT INTO PROPERTIES (title, description, owner_id, thumbnail_photo_url,
     cover_photo_url, cost_per_night, parking_spaces, number_of_bathrooms,
     number_of_bedrooms, province, city, country, street, post_code)
@@ -203,7 +202,6 @@ const addProperty = function(property) {
       console.error(err);
       throw err;
     })
-}
+};
 
 exports.addProperty = addProperty;
-
