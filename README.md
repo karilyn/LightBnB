@@ -51,11 +51,11 @@ A user can:
 
 # Project Screenshots 
 
-![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
-![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
-![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
-![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
+![Login/add user page](https://github.com/karilyn/LightBnB/blob/main/docs/login_page.png?raw=true)
+![Logged in home screen](https://github.com/karilyn/LightBnB/blob/main/docs/home_screen_logged_in.png?raw=true)
+![Create a new property](https://github.com/karilyn/LightBnB/blob/main/docs/create_a_property.png?raw=true)
+![Property search options](https://github.com/karilyn/LightBnB/blob/main/docs/property_search.png?raw=true)
 
 # Entity Relationship Diagram 
 
-![ERD](https://raw.githubusercontent.com/karilyn/LightBnB/b3cda154cd856d73302b7a98f1f487fb62964203/docs/lightBnB.jpg))
+![ERD](https://raw.githubusercontent.com/karilyn/LightBnB/b3cda154cd856d73302b7a98f1f487fb62964203/docs/lightBnB.jpg)
